@@ -15,22 +15,20 @@ class Post(BaseModel):
                               # and use Optional[int] to do the same. Optional[X] is equivalent to X | None (or Union[X, None])
 
 # for now we're saving posts in memory instead of a database. Will come back to it later.
-my_posts = [
-    {
+my_posts = {
+    1 : {
         "title" : "title of post 1",
         "content" : "content of post 1",
         "published" : False,
         "rating" : None,
-        "id" : 1,
     },
-    {
+    2 : {
         "title" : "title of post 2",
         "content" : "content of post 2",
         "published" : False,
         "rating" : None,
-        "id" : 2,
     },
-]
+}
 post_count = 2  # variable to assign post ids to new posts. Starts from 3 because we hard-coded the first two. Also acts as post
                 # counter.
 
@@ -57,7 +55,7 @@ def get_posts():
 # Fetch latest post
 @app.get("/posts/latest")
 def latest_post() -> dict:
-    return {"detail" : my_posts[-1]}
+    return {"detail" : my_posts[post_count]}
 
 
 # Fetch a specific post by id
@@ -67,7 +65,7 @@ def latest_post() -> dict:
                             # convert the path paramenter into the required datatype by specifying the target type in the function
                             # signature as a type hint/function decorator.
 def get_post(id : int, response : Response) -> dict:
-    post = next((post for post in my_posts if post["id"] == id), None)
+    post = my_posts.get(id, None)
     if not post:
         # response.status_code = status.HTTP_404_NOT_FOUND    # By declaring a parameter of type `Response` in the path operation func
         #                                                     # you can set the status code of the respone from that func.
@@ -91,15 +89,18 @@ def get_posts() -> dict:
 # Creates new post with specified fields in database
 @app.post("/posts", status_code=status.HTTP_201_CREATED)    # as an extra feature, you can specify the response code of the path 
                                                             # operation in the path's function decorator.
-def create_posts(post: Post) -> dict:
+def create_posts(post : Post) -> dict:
     global post_count
     post_count += 1
     new_post = post.model_dump(mode="json")
-    new_post["id"] = post_count
-    my_posts.append(new_post)
-    
+    my_posts[post_count] = new_post
     return {"data" : new_post}
 
+
+# Delete a post
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(post : Post, id : int) -> None:
+    del my_posts[id]
 
 # each pydantic model has a .model_dump() function that returns a dictionary of the model's fields and values. You can additionally
 # set the mode parameter to "json" to make sure the output dict has only json-serializable objects as by default model_dump() can 
