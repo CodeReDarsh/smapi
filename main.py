@@ -105,15 +105,12 @@ def create_posts(post: Post) -> dict:
 
 
 # Delete a post
-@app.delete("/posts/{id}", status_code=status.HTTP_200_OK)
-def delete_post(id : int) -> dict:
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id : int) -> None:
     idx = next((idx for idx in range(len(my_posts)) if my_posts[idx]["id"] == id), None)
-    print("I'm here and idx:", idx)
     if idx is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} doesn't exist. Could not be deleted.") 
-    print(f"idx value {idx}")
     del my_posts[idx]
-    return {"message" : f"post with id {id} was deleted"}
 
 # each pydantic model has a .model_dump() function that returns a dictionary of the model's fields and values. You can additionally
 # set the mode parameter to "json" to make sure the output dict has only json-serializable objects as by default model_dump() can 
