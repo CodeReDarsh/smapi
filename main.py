@@ -104,13 +104,31 @@ def create_posts(post: Post) -> dict:
     return {"data" : new_post}
 
 
+def get_index_by_id(id : int) -> int:
+    idx = next((idx for idx in range(len(my_posts)) if my_posts[idx]["id"] == id), None)
+    if idx is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} doesn't exist. Could not perform operation") 
+    return idx
+
+
 # Delete a post
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id : int) -> None:
-    idx = next((idx for idx in range(len(my_posts)) if my_posts[idx]["id"] == id), None)
-    if idx is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} doesn't exist. Could not be deleted.") 
-    del my_posts[idx]
+    del my_posts[get_index_by_id(id)]
+
+
+# Update a post
+@app.put("/posts/{id}", status_code=status.HTTP_202_ACCEPTED)
+def method_name(id : int, post : Post):
+    idx = get_index_by_id(id)
+    post_dict = post.model_dump(mode="json")
+    post_dict["id"] = id
+    my_posts[idx] = post_dict
+
+    return {
+        "message" : f"updated post with id: {id}",
+        "data" : post_dict,
+    }
 
 # each pydantic model has a .model_dump() function that returns a dictionary of the model's fields and values. You can additionally
 # set the mode parameter to "json" to make sure the output dict has only json-serializable objects as by default model_dump() can 
