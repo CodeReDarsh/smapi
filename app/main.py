@@ -154,3 +154,110 @@ standard convention is to name the urls in plural, so if you're creating a url f
 for a page for users would be /users not /user.
 
 """
+
+
+
+"""
+POSTGRESQL INFO
+
+By default, Postgres uses a concept called “roles” to handle authentication and authorization. These are, in some ways, similar to
+regular Unix-style accounts, but Postgres does not distinguish between users and groups and instead prefers the more flexible term
+“role”.
+
+Upon installation, Postgres is set up to use peer authentication, meaning that it associates Postgres roles with a matching 
+Unix/Linux system account. If a role exists within Postgres, a Unix/Linux username with the same name is able to sign in as that 
+role.
+
+The installation procedure created a user account called postgres that is associated with the default Postgres role. In order to
+use Postgres, you can log into that account.
+
+There are a few ways to utilize this account to access Postgres.
+Switching Over to the postgres Account
+
+Switch over to the postgres account on your server by typing:
+
+`sudo -i -u postgres`
+
+Then start the PostgreSQL Prompt
+
+`psql`
+
+You "should" see something like this:
+
+`postgres=#  `
+
+You can also do all this and send commands directly to the Postgresql prompt by doing
+
+`sudo -u <username assoicated with postgres> <postgresql command>`
+
+so that will translate to (in order to start): `sudo -u postgres psql` because upon installation the current default username is 
+postgres. Otherwise you can create a new username for running postgres using the following command:
+
+`sudo -u <current_username> createuser --interactive` e.g. sudo -u postgres createuser --interactive
+
+and accordingly create a new database with the same name as that's how postgres does authentication.
+
+`sudo -u <current_username> createdb <new_username>` e.g. sudo -u postgres createdb adarshdb
+
+
+## TABLES
+
+Any subject or event in an application is represented by a table in the database. These tables can then be related to each other in
+some way, shape or form, hence the term relational database. For example, lets say we have three tables: user, products, purchases
+The user table can be related to the purchases table and then that can be related to the products table depending on the what the 
+user purchased. 
+
+## Columns VS Rows
+
+Each table has rows and columns, cols represent different attributes of an entry in the table. Each row then represents a single
+entry. For example in the users table we can have cols for ID, Name, Age and Sex. Each row would then indicate the entry for a
+single user.
+
+## Postgres Datatypes
+
+Postgres has datatypes just like normal programming languages like, numeric(int, decimal, precision), text(varchar, text),
+bool(boolean), sequence(array). The python equivs are int, float, string, bool and list respectively.
+
+## Primary Key
+
+Each table needs a column or a group of columns that uniquely identifies each row in a table called a primary key. A table can 
+only have one and only one primary key and each key must be unique.
+
+It's upto choice which column you prefer to serve as the primary key.
+
+## Constraints
+
+1. UNIQUE - a 'UNIQUE' constraint can be applied to any column to make sure every record has a unique value for that column
+2. NULL - By default when adding a new entry to a database a column can be left blank. When a column is left blank it has a 
+          NULL value. If you need a column to be properly filled in to create a new record a NOT NULL constraint can be added to 
+          the column to ensure that the column is never left blank.
+
+          
+ALTER ROLE <role_name> WITH <option> - a really powerful tool
+
+🔑 Permission and Attribute Options You Can Set or Reset
+
+| Option                          | Description                                                                |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| `SUPERUSER` / `NOSUPERUSER`     | Grant or revoke superuser status                                           |
+| `CREATEDB` / `NOCREATEDB`       | Allow or disallow creating databases                                       |
+| `CREATEROLE` / `NOCREATEROLE`   | Allow or disallow creating (and altering) roles                            |
+| `INHERIT` / `NOINHERIT`         | Allow or disallow inheriting permissions of roles this role is a member of |
+| `LOGIN` / `NOLOGIN`             | Allow or disallow login ability (i.e., can this role authenticate)         |
+| `REPLICATION` / `NOREPLICATION` | Allow or disallow streaming replication connections                        |
+| `BYPASSRLS` / `NOBYPASSRLS`     | Allow or disallow bypassing Row-Level Security policies                    |
+
+🛠 Other common role attribute modifications:
+
+| Command                   | Description                                 |
+| ------------------------- | ------------------------------------------- |
+| `PASSWORD 'password'`     | Set or change role’s password               |
+| `VALID UNTIL 'timestamp'` | Set expiration time for the role’s password |
+| `CONNECTION LIMIT n`      | Set max concurrent connections (n ≥ 0)      |
+| `IN ROLE role1, role2`    | Add role to memberships of other roles      |
+| `ROLE role1, role2`       | Same as above (alternate syntax)            |
+| `ADMIN ROLE role1, role2` | Make this role admin of other roles         |
+| `USER`                    | Deprecated alias for LOGIN                  |
+
+
+"""
